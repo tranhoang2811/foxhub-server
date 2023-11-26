@@ -1,6 +1,9 @@
-import {model, property} from '@loopback/repository';
+import {model, property, hasMany} from '@loopback/repository';
 import {EHouseStatus} from '../enums/house';
 import {Base} from './base.model';
+import {Room} from './room.model';
+import {FavoriteHouse} from './favorite-house.model';
+import {HouseReport} from './house-report.model';
 
 @model({
   settings: {
@@ -37,6 +40,15 @@ export class House extends Base {
     },
   })
   status: EHouseStatus;
+
+  @hasMany(() => Room)
+  rooms: Room[];
+
+  @hasMany(() => FavoriteHouse)
+  favoriteHouses: FavoriteHouse[];
+
+  @hasMany(() => HouseReport)
+  houseReports: HouseReport[];
 
   constructor(data?: Partial<House>) {
     super(data);

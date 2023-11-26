@@ -1,6 +1,7 @@
-import {model, property} from '@loopback/repository';
+import {model, property, belongsTo} from '@loopback/repository';
 import {ERoomStatus} from '../enums/room';
 import {Base} from './base.model';
+import {House} from './house.model';
 
 @model({
   settings: {
@@ -55,6 +56,9 @@ export class Room extends Base {
     required: true,
   })
   price: number;
+
+  @belongsTo(() => House)
+  houseId: string;
 
   constructor(data?: Partial<Room>) {
     super(data);

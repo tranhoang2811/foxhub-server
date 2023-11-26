@@ -1,5 +1,7 @@
-import {model, property} from '@loopback/repository';
+import {model, property, belongsTo} from '@loopback/repository';
 import {Base} from './base.model';
+import {House} from './house.model';
+import {User} from './user.model';
 
 @model({
   settings: {
@@ -21,6 +23,12 @@ export class HouseReport extends Base {
     required: true,
   })
   reason: string;
+
+  @belongsTo(() => House)
+  houseId: string;
+
+  @belongsTo(() => User)
+  reporterId: string;
 
   constructor(data?: Partial<HouseReport>) {
     super(data);

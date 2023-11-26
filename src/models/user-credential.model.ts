@@ -1,5 +1,6 @@
-import {model, property} from '@loopback/repository';
+import {model, property, belongsTo} from '@loopback/repository';
 import {Base} from './base.model';
+import {User} from './user.model';
 
 @model({
   settings: {
@@ -21,6 +22,9 @@ export class UserCredential extends Base {
     required: true,
   })
   password: string;
+
+  @belongsTo(() => User)
+  userId: string;
 
   constructor(data?: Partial<UserCredential>) {
     super(data);

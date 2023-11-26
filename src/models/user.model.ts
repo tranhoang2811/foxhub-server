@@ -1,6 +1,10 @@
-import {model, property} from '@loopback/repository';
+import {model, property, hasOne, hasMany} from '@loopback/repository';
 import {EUserRole, EUserStatus} from '../enums/user';
 import {Base} from './base.model';
+import {UserCredential} from './user-credential.model';
+import {Reservation} from './reservation.model';
+import {FavoriteHouse} from './favorite-house.model';
+import {HouseReport} from './house-report.model';
 
 @model({
   settings: {
@@ -64,6 +68,18 @@ export class User extends Base {
     },
   })
   role: EUserRole;
+
+  @hasOne(() => UserCredential)
+  userCredential: UserCredential;
+
+  @hasMany(() => Reservation, {keyTo: 'renterId'})
+  reservations: Reservation[];
+
+  @hasMany(() => FavoriteHouse, {keyTo: 'renterId'})
+  favoriteHouses: FavoriteHouse[];
+
+  @hasMany(() => HouseReport, {keyTo: 'reporterId'})
+  houseReports: HouseReport[];
 
   constructor(data?: Partial<User>) {
     super(data);

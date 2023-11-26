@@ -1,6 +1,8 @@
-import {model, property} from '@loopback/repository';
+import {model, property, belongsTo} from '@loopback/repository';
 import {EReservationPaymentStatus} from '../enums/reservation';
 import {Base} from './base.model';
+import {Room} from './room.model';
+import {User} from './user.model';
 
 @model({
   settings: {
@@ -48,6 +50,12 @@ export class Reservation extends Base {
     required: true,
   })
   checkOut: string;
+
+  @belongsTo(() => Room)
+  roomId: string;
+
+  @belongsTo(() => User)
+  renterId: string;
 
   constructor(data?: Partial<Reservation>) {
     super(data);
