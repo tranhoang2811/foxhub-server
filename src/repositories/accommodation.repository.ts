@@ -1,61 +1,48 @@
 import {Getter, inject} from '@loopback/core';
-import {
-  HasManyRepositoryFactory,
-  HasOneRepositoryFactory,
-  repository,
-} from '@loopback/repository';
+import {HasManyRepositoryFactory, repository} from '@loopback/repository';
 import {MongodbDataSource} from '../datasources';
 import {
+  Accommodation,
+  AccommodationRelations,
   AccommodationReport,
   FavoriteAccommodation,
-  Reservation,
-  User,
-  UserCredential,
-  UserRelations,
+  Room,
 } from '../models';
 import {AccommodationReportRepository} from './accommodation-report.repository';
 import {CrudRepository} from './crud.repository.base';
 import {FavoriteAccommodationRepository} from './favorite-accommodation.repository';
-import {ReservationRepository} from './reservation.repository';
-import {UserCredentialRepository} from './user-credential.repository';
+import {RoomRepository} from './room.repository';
 
-export class UserRepository extends CrudRepository<
-  User,
-  typeof User.prototype.id,
-  UserRelations
+export class AccommodationRepository extends CrudRepository<
+  Accommodation,
+  typeof Accommodation.prototype.id,
+  AccommodationRelations
 > {
-  public readonly userCredential: HasOneRepositoryFactory<
-    UserCredential,
-    typeof User.prototype.id
-  >;
-
-  public readonly reservations: HasManyRepositoryFactory<
-    Reservation,
-    typeof User.prototype.id
+  public readonly rooms: HasManyRepositoryFactory<
+    Room,
+    typeof Accommodation.prototype.id
   >;
 
   public readonly favoriteAccommodations: HasManyRepositoryFactory<
     FavoriteAccommodation,
-    typeof User.prototype.id
+    typeof Accommodation.prototype.id
   >;
 
   public readonly accommodationReports: HasManyRepositoryFactory<
     AccommodationReport,
-    typeof User.prototype.id
+    typeof Accommodation.prototype.id
   >;
 
   constructor(
     @inject('datasources.mongodb') dataSource: MongodbDataSource,
-    @repository.getter('UserCredentialRepository')
-    protected userCredentialRepositoryGetter: Getter<UserCredentialRepository>,
-    @repository.getter('ReservationRepository')
-    protected reservationRepositoryGetter: Getter<ReservationRepository>,
+    @repository.getter('RoomRepository')
+    protected roomRepositoryGetter: Getter<RoomRepository>,
     @repository.getter('FavoriteAccommodationRepository')
     protected favoriteAccommodationRepositoryGetter: Getter<FavoriteAccommodationRepository>,
     @repository.getter('AccommodationReportRepository')
     protected accommodationReportRepositoryGetter: Getter<AccommodationReportRepository>,
   ) {
-    super(User, dataSource);
+    super(Accommodation, dataSource);
     this.accommodationReports = this.createHasManyRepositoryFactoryFor(
       'accommodationReports',
       accommodationReportRepositoryGetter,
@@ -72,21 +59,10 @@ export class UserRepository extends CrudRepository<
       'favoriteAccommodations',
       this.favoriteAccommodations.inclusionResolver,
     );
-    this.reservations = this.createHasManyRepositoryFactoryFor(
-      'reservations',
-      reservationRepositoryGetter,
+    this.rooms = this.createHasManyRepositoryFactoryFor(
+      'rooms',
+      roomRepositoryGetter,
     );
-    this.registerInclusionResolver(
-      'reservations',
-      this.reservations.inclusionResolver,
-    );
-    this.userCredential = this.createHasOneRepositoryFactoryFor(
-      'userCredential',
-      userCredentialRepositoryGetter,
-    );
-    this.registerInclusionResolver(
-      'userCredential',
-      this.userCredential.inclusionResolver,
-    );
+    this.registerInclusionResolver('rooms', this.rooms.inclusionResolver);
   }
 }

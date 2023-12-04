@@ -8,9 +8,7 @@ export class MediaRepository extends CrudRepository<
   typeof Media.prototype.id,
   MediaRelations
 > {
-  constructor(
-    @inject('datasources.mongodb') dataSource: MongodbDataSource,
-  ) {
+  constructor(@inject('datasources.mongodb') dataSource: MongodbDataSource) {
     super(Media, dataSource);
   }
 }
