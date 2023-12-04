@@ -1,16 +1,16 @@
 import {model, property, belongsTo} from '@loopback/repository';
 import {Base} from './base.model';
-import {House} from './house.model';
+import {Accommodation} from './accommodation.model';
 import {User} from './user.model';
 
 @model({
   settings: {
     mongodb: {
-      collection: 'HouseReports',
+      collection: 'AccommodationReports',
     },
   },
 })
-export class HouseReport extends Base {
+export class AccommodationReport extends Base {
   @property({
     type: 'string',
     id: true,
@@ -24,19 +24,20 @@ export class HouseReport extends Base {
   })
   reason: string;
 
-  @belongsTo(() => House)
-  houseId: string;
+  @belongsTo(() => Accommodation)
+  accommodationId: string;
 
   @belongsTo(() => User)
   reporterId: string;
 
-  constructor(data?: Partial<HouseReport>) {
+  constructor(data?: Partial<AccommodationReport>) {
     super(data);
   }
 }
 
-export interface HouseReportRelations {
+export interface AccommodationReportRelations {
   // describe navigational properties here
 }
 
-export type HouseReportWithRelations = HouseReport & HouseReportRelations;
+export type AccommodationReportWithRelations = AccommodationReport &
+  AccommodationReportRelations;

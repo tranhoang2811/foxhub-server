@@ -1,4 +1,4 @@
-export enum EHouseStatus {
+export enum EAccommodationStatus {
   PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',

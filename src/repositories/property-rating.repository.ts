@@ -8,9 +8,7 @@ export class PropertyRatingRepository extends CrudRepository<
   typeof PropertyRating.prototype.id,
   PropertyRatingRelations
 > {
-  constructor(
-    @inject('datasources.mongodb') dataSource: MongodbDataSource,
-  ) {
+  constructor(@inject('datasources.mongodb') dataSource: MongodbDataSource) {
     super(PropertyRating, dataSource);
   }
 }
