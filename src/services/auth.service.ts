@@ -2,8 +2,11 @@ import {BindingScope, inject, injectable} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors} from '@loopback/rest';
 import {securityId, UserProfile} from '@loopback/security';
+import omit from 'lodash/omit';
 import {INVALID_CREDENTIALS_ERROR} from '../constants/auth';
 import {LoginCredentialsDto} from '../dtos/auth/requests/login.request';
+import {SignupInformationDto} from '../dtos/auth/requests/signup.request';
+import {EUserRole} from '../enums/user';
 import {BcryptBindings, TokenServiceBindings} from '../keys';
 import {User, UserWithRelations} from '../models';
 import {UserRepository} from '../repositories';
@@ -30,7 +33,21 @@ export class AuthService {
     return token;
   }
 
-  public async signup(user: Omit<User, 'id'>): Promise<void> {}
+  public async signup(signupInformation: SignupInformationDto): Promise<void> {
+    const hashedPassword: string = await this.bcryptService.hashPassword(
+      signupInformation.password,
+    );
+
+    const createdUser: User = await this.userRepository.create({
+      ...omit(signupInformation, 'password'),
+      role: EUserRole.RENTER,
+    });
+
+    await this.userRepository.userCredential(createdUser.id).create({
+      password: hashedPassword,
+      userId: createdUser.id,
+    });
+  }
 
   private async verifyCredentials(
     credentials: LoginCredentialsDto,

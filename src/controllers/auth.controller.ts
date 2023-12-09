@@ -1,7 +1,7 @@
 import {service} from '@loopback/core';
 import {getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {LoginCredentialsDto} from '../dtos/auth/requests/login.request';
-import {User} from '../models';
+import {SignupInformationDto} from '../dtos/auth/requests/signup.request';
 import {AuthService} from '../services/auth.service';
 
 export class AuthController {
@@ -11,7 +11,7 @@ export class AuthController {
   ) {}
 
   @post('/auth/login')
-  @response(200, {})
+  @response(200)
   async login(
     @requestBody({
       content: {
@@ -26,15 +26,17 @@ export class AuthController {
   }
 
   @post('/auth/signup')
-  @response(200, {})
+  @response(204)
   async signup(
     @requestBody({
       content: {
-        'application/json': {},
+        'application/json': {
+          schema: getModelSchemaRef(SignupInformationDto),
+        },
       },
     })
-    user: Omit<User, 'id'>,
+    signupInformationDto: SignupInformationDto,
   ): Promise<void> {
-    await this.authService.signup(user);
+    await this.authService.signup(signupInformationDto);
   }
 }
