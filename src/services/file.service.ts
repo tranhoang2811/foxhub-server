@@ -1,16 +1,16 @@
-import {injectable, BindingScope} from '@loopback/context';
+import {BindingScope, injectable} from '@loopback/core';
 import {Request, Response} from '@loopback/rest';
 import {initializeApp} from 'firebase/app';
 import {
+  FirebaseStorage,
   getStorage,
   ref,
-  uploadBytes,
-  FirebaseStorage,
   StorageReference,
+  uploadBytes,
 } from 'firebase/storage';
+import {lookup} from 'mime-types';
 import multer from 'multer';
 import {uuid} from 'uuidv4';
-import {lookup} from 'mime-types';
 import {
   FIREBASE_CONFIG,
   FIREBASE_PROPERTY_IMAGE_FOLDER,
