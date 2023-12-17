@@ -1,13 +1,33 @@
-import {service} from '@loopback/core';
-import {getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
+import {AuthenticationBindings} from '@loopback/authentication';
+import {inject, service} from '@loopback/core';
+import {
+  get,
+  getModelSchemaRef,
+  post,
+  requestBody,
+  RequestWithSession,
+  Response,
+  response,
+  RestBindings,
+} from '@loopback/rest';
+import {SecurityBindings, UserProfile} from '@loopback/security';
+import omit from 'lodash/omit';
+import {BE_BASE_URL} from '../config';
 import {LoginCredentialsDto} from '../dtos/auth/requests/login.request';
 import {SignupInformationDto} from '../dtos/auth/requests/signup.request';
+import {oAuth2InterceptExpressMiddleware} from '../interceptors';
+import {TokenServiceBindings} from '../keys';
+import {User} from '../models';
 import {AuthService} from '../services/auth.service';
+import {JWTService} from '../services/jwt.service';
 
 export class AuthController {
   constructor(
     @service(AuthService)
     private authService: AuthService,
+
+    @inject(TokenServiceBindings.TOKEN_SERVICE)
+    private jwtService: JWTService,
   ) {}
 
   @post('/auth/login')
@@ -38,5 +58,41 @@ export class AuthController {
     signupInformationDto: SignupInformationDto,
   ): Promise<void> {
     await this.authService.signup(signupInformationDto);
+  }
+
+  @get('/auth/third-party/{provider}')
+  loginToThirdParty(
+    @inject(AuthenticationBindings.AUTHENTICATION_REDIRECT_URL)
+    redirectUrl: string,
+    @inject(AuthenticationBindings.AUTHENTICATION_REDIRECT_STATUS)
+    status: number,
+    @inject(RestBindings.Http.RESPONSE)
+    response: Response,
+  ) {
+    response.statusCode = status || 302;
+    response.setHeader('Location', redirectUrl);
+    response.end();
+    return response;
+  }
+
+  @oAuth2InterceptExpressMiddleware()
+  @get('/auth/third-party/{provider}/callback')
+  async thirdPartyCallBack(
+    @inject(SecurityBindings.USER) user: UserProfile,
+    @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ) {
+    const currentUser: User = {
+      ...omit(user, 'profile'),
+      ...user?.profile,
+    };
+    const userProfile: UserProfile =
+      this.authService.convertToUserProfile(currentUser);
+    const token: string = await this.jwtService.generateToken(userProfile);
+    request.session.user = user;
+
+    return response.redirect(
+      `${BE_BASE_URL}/social-authentication-loading?token=${token}`,
+    );
   }
 }

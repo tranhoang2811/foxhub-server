@@ -8,3 +8,4 @@ export * from './reservation.model';
 export * from './room.model';
 export * from './user-credential.model';
 export * from './user.model';
+export * from './user-identity.model';

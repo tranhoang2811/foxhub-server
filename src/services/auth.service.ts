@@ -49,6 +49,16 @@ export class AuthService {
     });
   }
 
+  public convertToUserProfile(user: User): UserProfile {
+    const userProfile: UserProfile = {
+      [securityId]: user.id,
+      id: user.id,
+      role: user.role,
+    };
+
+    return userProfile;
+  }
+
   private async verifyCredentials(
     credentials: LoginCredentialsDto,
   ): Promise<User> {
@@ -76,15 +86,5 @@ export class AuthService {
     }
 
     return foundUser;
-  }
-
-  private convertToUserProfile(user: User): UserProfile {
-    const userProfile: UserProfile = {
-      [securityId]: user.id,
-      id: user.id,
-      role: user.role,
-    };
-
-    return userProfile;
   }
 }
