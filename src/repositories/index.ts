@@ -7,3 +7,4 @@ export * from './reservation.repository';
 export * from './room.repository';
 export * from './user-credential.repository';
 export * from './user.repository';
+export * from './user-identity.repository';

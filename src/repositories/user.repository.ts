@@ -11,6 +11,7 @@ import {
   Reservation,
   User,
   UserCredential,
+  UserIdentity,
   UserRelations,
 } from '../models';
 import {AccommodationReportRepository} from './accommodation-report.repository';
@@ -18,6 +19,7 @@ import {CrudRepository} from './crud.repository.base';
 import {FavoriteAccommodationRepository} from './favorite-accommodation.repository';
 import {ReservationRepository} from './reservation.repository';
 import {UserCredentialRepository} from './user-credential.repository';
+import {UserIdentityRepository} from './user-identity.repository';
 
 export class UserRepository extends CrudRepository<
   User,
@@ -44,6 +46,11 @@ export class UserRepository extends CrudRepository<
     typeof User.prototype.id
   >;
 
+  public readonly userIdentities: HasManyRepositoryFactory<
+    UserIdentity,
+    typeof User.prototype.id
+  >;
+
   constructor(
     @inject('datasources.mongodb') dataSource: MongodbDataSource,
     @repository.getter('UserCredentialRepository')
@@ -54,8 +61,18 @@ export class UserRepository extends CrudRepository<
     protected favoriteAccommodationRepositoryGetter: Getter<FavoriteAccommodationRepository>,
     @repository.getter('AccommodationReportRepository')
     protected accommodationReportRepositoryGetter: Getter<AccommodationReportRepository>,
+    @repository.getter('UserIdentityRepository')
+    protected userIdentityRepositoryGetter: Getter<UserIdentityRepository>,
   ) {
     super(User, dataSource);
+    this.userIdentities = this.createHasManyRepositoryFactoryFor(
+      'userIdentities',
+      userIdentityRepositoryGetter,
+    );
+    this.registerInclusionResolver(
+      'userIdentities',
+      this.userIdentities.inclusionResolver,
+    );
     this.accommodationReports = this.createHasManyRepositoryFactoryFor(
       'accommodationReports',
       accommodationReportRepositoryGetter,

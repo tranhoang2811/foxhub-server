@@ -3,3 +3,9 @@ export interface IDecodedToken {
   exp: number;
   id: string;
 }
+
+export interface ISessionUser extends Express.User {
+  id: string;
+  email: string;
+  role: string;
+}
