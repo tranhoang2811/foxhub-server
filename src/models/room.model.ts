@@ -51,12 +51,6 @@ export class Room extends Base {
   })
   availablePeople: number;
 
-  @property({
-    type: 'number',
-    required: true,
-  })
-  price: number;
-
   @belongsTo(() => Accommodation)
   accommodationId: string;
 

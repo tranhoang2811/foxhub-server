@@ -1,17 +1,17 @@
 import {Getter, inject} from '@loopback/core';
-import {HasManyRepositoryFactory, repository} from '@loopback/repository';
+import {HasManyRepositoryFactory, repository, BelongsToAccessor} from '@loopback/repository';
 import {MongodbDataSource} from '../datasources';
 import {
   Accommodation,
   AccommodationRelations,
   AccommodationReport,
   FavoriteAccommodation,
-  Room,
-} from '../models';
+  Room, User} from '../models';
 import {AccommodationReportRepository} from './accommodation-report.repository';
 import {CrudRepository} from './crud.repository.base';
 import {FavoriteAccommodationRepository} from './favorite-accommodation.repository';
 import {RoomRepository} from './room.repository';
+import {UserRepository} from './user.repository';
 
 export class AccommodationRepository extends CrudRepository<
   Accommodation,
@@ -33,6 +33,8 @@ export class AccommodationRepository extends CrudRepository<
     typeof Accommodation.prototype.id
   >;
 
+  public readonly owner: BelongsToAccessor<User, typeof Accommodation.prototype.id>;
+
   constructor(
     @inject('datasources.mongodb') dataSource: MongodbDataSource,
     @repository.getter('RoomRepository')
@@ -40,9 +42,11 @@ export class AccommodationRepository extends CrudRepository<
     @repository.getter('FavoriteAccommodationRepository')
     protected favoriteAccommodationRepositoryGetter: Getter<FavoriteAccommodationRepository>,
     @repository.getter('AccommodationReportRepository')
-    protected accommodationReportRepositoryGetter: Getter<AccommodationReportRepository>,
+    protected accommodationReportRepositoryGetter: Getter<AccommodationReportRepository>, @repository.getter('UserRepository') protected userRepositoryGetter: Getter<UserRepository>,
   ) {
     super(Accommodation, dataSource);
+    this.owner = this.createBelongsToAccessorFor('owner', userRepositoryGetter,);
+    this.registerInclusionResolver('owner', this.owner.inclusionResolver);
     this.accommodationReports = this.createHasManyRepositoryFactoryFor(
       'accommodationReports',
       accommodationReportRepositoryGetter,

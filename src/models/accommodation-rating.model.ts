@@ -1,20 +1,20 @@
 import {model, property} from '@loopback/repository';
-import {Base} from './base.model';
+import {Base} from '.';
 
 @model({
   settings: {
     mongodb: {
-      collection: 'PropertyRatings',
+      collection: 'AccommodationRatings',
     },
   },
 })
-export class PropertyRating extends Base {
+export class AccommodationRating extends Base {
   @property({
     type: 'string',
     id: true,
     generated: true,
   })
-  id?: string;
+  id: string;
 
   @property({
     type: 'number',
@@ -27,14 +27,14 @@ export class PropertyRating extends Base {
   })
   review?: string;
 
-  constructor(data?: Partial<PropertyRating>) {
+  constructor(data?: Partial<AccommodationRating>) {
     super(data);
   }
 }
 
-export interface PropertyRatingRelations {
+export interface AccommodationRatingRelations {
   // describe navigational properties here
 }
 
-export type PropertyRatingWithRelations = PropertyRating &
-  PropertyRatingRelations;
+export type AccommodationRatingWithRelations = AccommodationRating &
+  AccommodationRatingRelations;
