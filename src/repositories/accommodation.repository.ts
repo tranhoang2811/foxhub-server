@@ -6,12 +6,14 @@ import {
   AccommodationRelations,
   AccommodationReport,
   FavoriteAccommodation,
-  Room, User} from '../models';
+  Room, User, AccommodationRating, Media} from '../models';
 import {AccommodationReportRepository} from './accommodation-report.repository';
 import {CrudRepository} from './crud.repository.base';
 import {FavoriteAccommodationRepository} from './favorite-accommodation.repository';
 import {RoomRepository} from './room.repository';
 import {UserRepository} from './user.repository';
+import {AccommodationRatingRepository} from './accommodation-rating.repository';
+import {MediaRepository} from './media.repository';
 
 export class AccommodationRepository extends CrudRepository<
   Accommodation,
@@ -35,6 +37,10 @@ export class AccommodationRepository extends CrudRepository<
 
   public readonly owner: BelongsToAccessor<User, typeof Accommodation.prototype.id>;
 
+  public readonly accommodationRatings: HasManyRepositoryFactory<AccommodationRating, typeof Accommodation.prototype.id>;
+
+  public readonly media: HasManyRepositoryFactory<Media, typeof Accommodation.prototype.id>;
+
   constructor(
     @inject('datasources.mongodb') dataSource: MongodbDataSource,
     @repository.getter('RoomRepository')
@@ -42,9 +48,13 @@ export class AccommodationRepository extends CrudRepository<
     @repository.getter('FavoriteAccommodationRepository')
     protected favoriteAccommodationRepositoryGetter: Getter<FavoriteAccommodationRepository>,
     @repository.getter('AccommodationReportRepository')
-    protected accommodationReportRepositoryGetter: Getter<AccommodationReportRepository>, @repository.getter('UserRepository') protected userRepositoryGetter: Getter<UserRepository>,
+    protected accommodationReportRepositoryGetter: Getter<AccommodationReportRepository>, @repository.getter('UserRepository') protected userRepositoryGetter: Getter<UserRepository>, @repository.getter('AccommodationRatingRepository') protected accommodationRatingRepositoryGetter: Getter<AccommodationRatingRepository>, @repository.getter('MediaRepository') protected mediaRepositoryGetter: Getter<MediaRepository>,
   ) {
     super(Accommodation, dataSource);
+    this.media = this.createHasManyRepositoryFactoryFor('media', mediaRepositoryGetter,);
+    this.registerInclusionResolver('media', this.media.inclusionResolver);
+    this.accommodationRatings = this.createHasManyRepositoryFactoryFor('accommodationRatings', accommodationRatingRepositoryGetter,);
+    this.registerInclusionResolver('accommodationRatings', this.accommodationRatings.inclusionResolver);
     this.owner = this.createBelongsToAccessorFor('owner', userRepositoryGetter,);
     this.registerInclusionResolver('owner', this.owner.inclusionResolver);
     this.accommodationReports = this.createHasManyRepositoryFactoryFor(

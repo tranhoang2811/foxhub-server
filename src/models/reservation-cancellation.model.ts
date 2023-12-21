@@ -1,5 +1,6 @@
-import {model, property} from '@loopback/repository';
+import {belongsTo, model, property} from '@loopback/repository';
 import {Base} from './base.model';
+import {Reservation} from './reservation.model';
 
 @model({
   settings: {
@@ -21,6 +22,9 @@ export class ReservationCancellation extends Base {
     required: true,
   })
   reason: string;
+
+  @belongsTo(() => Reservation)
+  reservationId: string;
 
   constructor(data?: Partial<ReservationCancellation>) {
     super(data);

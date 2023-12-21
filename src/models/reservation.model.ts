@@ -1,8 +1,9 @@
-import {belongsTo, model, property} from '@loopback/repository';
+import {belongsTo, model, property, hasOne} from '@loopback/repository';
 import {EPaymentMethod, EReservationPaymentStatus} from '../enums/reservation';
 import {Base} from './base.model';
 import {Room} from './room.model';
 import {User} from './user.model';
+import {ReservationCancellation} from './reservation-cancellation.model';
 
 @model({
   settings: {
@@ -72,6 +73,9 @@ export class Reservation extends Base {
 
   @belongsTo(() => User)
   renterId: string;
+
+  @hasOne(() => ReservationCancellation)
+  reservationCancellation: ReservationCancellation;
 
   constructor(data?: Partial<Reservation>) {
     super(data);

@@ -1,8 +1,10 @@
 import {belongsTo, hasMany, model, property} from '@loopback/repository';
 import {EAccommodationStatus, EAccommodationType} from '../enums/accommodation';
+import {AccommodationRating} from './accommodation-rating.model';
 import {AccommodationReport} from './accommodation-report.model';
 import {Base} from './base.model';
 import {FavoriteAccommodation} from './favorite-accommodation.model';
+import {Media} from './media.model';
 import {Room} from './room.model';
 import {User} from './user.model';
 
@@ -80,6 +82,12 @@ export class Accommodation extends Base {
 
   @hasMany(() => AccommodationReport)
   accommodationReports: AccommodationReport[];
+
+  @hasMany(() => AccommodationRating)
+  accommodationRatings: AccommodationRating[];
+
+  @hasMany(() => Media)
+  media: Media[];
 
   constructor(data?: Partial<Accommodation>) {
     super(data);

@@ -7,6 +7,7 @@ import {FavoriteAccommodation} from './favorite-accommodation.model';
 import {Reservation} from './reservation.model';
 import {UserCredential} from './user-credential.model';
 import {UserIdentity} from './user-identity.model';
+import {AccommodationRating} from './accommodation-rating.model';
 
 @model({
   settings: {
@@ -95,6 +96,9 @@ export class User extends Base {
 
   @hasMany(() => Accommodation, {keyTo: 'ownerId'})
   accommodations: Accommodation[];
+
+  @hasMany(() => AccommodationRating, {keyTo: 'reviewerId'})
+  accommodationRatings: AccommodationRating[];
 
   constructor(data?: Partial<User>) {
     super(data);

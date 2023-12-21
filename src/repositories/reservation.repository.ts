@@ -1,10 +1,11 @@
 import {Getter, inject} from '@loopback/core';
-import {BelongsToAccessor, repository} from '@loopback/repository';
+import {BelongsToAccessor, repository, HasOneRepositoryFactory} from '@loopback/repository';
 import {MongodbDataSource} from '../datasources';
-import {Reservation, ReservationRelations, Room, User} from '../models';
+import {Reservation, ReservationRelations, Room, User, ReservationCancellation} from '../models';
 import {CrudRepository} from './crud.repository.base';
 import {RoomRepository} from './room.repository';
 import {UserRepository} from './user.repository';
+import {ReservationCancellationRepository} from './reservation-cancellation.repository';
 
 export class ReservationRepository extends CrudRepository<
   Reservation,
@@ -21,14 +22,18 @@ export class ReservationRepository extends CrudRepository<
     typeof Reservation.prototype.id
   >;
 
+  public readonly reservationCancellation: HasOneRepositoryFactory<ReservationCancellation, typeof Reservation.prototype.id>;
+
   constructor(
     @inject('datasources.mongodb') dataSource: MongodbDataSource,
     @repository.getter('RoomRepository')
     protected roomRepositoryGetter: Getter<RoomRepository>,
     @repository.getter('UserRepository')
-    protected userRepositoryGetter: Getter<UserRepository>,
+    protected userRepositoryGetter: Getter<UserRepository>, @repository.getter('ReservationCancellationRepository') protected reservationCancellationRepositoryGetter: Getter<ReservationCancellationRepository>,
   ) {
     super(Reservation, dataSource);
+    this.reservationCancellation = this.createHasOneRepositoryFactoryFor('reservationCancellation', reservationCancellationRepositoryGetter);
+    this.registerInclusionResolver('reservationCancellation', this.reservationCancellation.inclusionResolver);
     this.renter = this.createBelongsToAccessorFor(
       'renter',
       userRepositoryGetter,
