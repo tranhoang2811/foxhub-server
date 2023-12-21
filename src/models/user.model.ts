@@ -1,11 +1,13 @@
 import {hasMany, hasOne, model, property} from '@loopback/repository';
 import {EUserRole, EUserStatus} from '../enums/user';
 import {AccommodationReport} from './accommodation-report.model';
+import {Accommodation} from './accommodation.model';
 import {Base} from './base.model';
 import {FavoriteAccommodation} from './favorite-accommodation.model';
 import {Reservation} from './reservation.model';
 import {UserCredential} from './user-credential.model';
 import {UserIdentity} from './user-identity.model';
+import {AccommodationRating} from './accommodation-rating.model';
 
 @model({
   settings: {
@@ -48,8 +50,15 @@ export class User extends Base {
 
   @property({
     type: 'date',
+    required: true,
   })
-  dateOfBirth?: string;
+  dateOfBirth: Date;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  occupation: string;
 
   @property({
     type: 'string',
@@ -84,6 +93,12 @@ export class User extends Base {
 
   @hasMany(() => UserIdentity)
   userIdentities: UserIdentity[];
+
+  @hasMany(() => Accommodation, {keyTo: 'ownerId'})
+  accommodations: Accommodation[];
+
+  @hasMany(() => AccommodationRating, {keyTo: 'reviewerId'})
+  accommodationRatings: AccommodationRating[];
 
   constructor(data?: Partial<User>) {
     super(data);

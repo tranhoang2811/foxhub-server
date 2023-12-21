@@ -4,3 +4,11 @@ export enum EAccommodationStatus {
   REJECTED = 'rejected',
   BANNED = 'banned',
 }
+
+export enum EAccommodationType {
+  LOCAL_HOUSE = 'local-house',
+  HOMESTAY = 'homestay',
+  HOTEL = 'hotel',
+  VILLA = 'villa',
+  APARTMENT = 'apartment',
+}

@@ -1,5 +1,6 @@
-import {model, property} from '@loopback/repository';
+import {model, property, belongsTo} from '@loopback/repository';
 import {Base} from './base.model';
+import {Accommodation} from './accommodation.model';
 
 @model({
   settings: {
@@ -21,6 +22,9 @@ export class Media extends Base {
     required: true,
   })
   source: string;
+
+  @belongsTo(() => Accommodation)
+  accommodationId: string;
 
   constructor(data?: Partial<Media>) {
     super(data);
