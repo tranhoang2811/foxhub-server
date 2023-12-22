@@ -1,3 +1,4 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -7,23 +8,28 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
-import {Accommodation} from '../../models';
+import {IPaginationList} from '../../interfaces/common';
+import {Accommodation, AccommodationRatingRelations} from '../../models';
 import {AccommodationRepository} from '../../repositories';
+import {AccommodationService} from '../../services/staff/accommodation.service';
 
 export class AccommodationController {
   constructor(
     @repository(AccommodationRepository)
     public accommodationRepository: AccommodationRepository,
+
+    @service(AccommodationService)
+    public accommodationService: AccommodationService,
   ) {}
 
   @post('/accommodations')
@@ -60,20 +66,17 @@ export class AccommodationController {
 
   @get('/accommodations')
   @response(200, {
-    description: 'Array of Accommodation model instances',
+    description: 'Paginate accommodation list',
     content: {
       'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Accommodation, {includeRelations: true}),
-        },
+        schema: {},
       },
     },
   })
-  async find(
+  async paginate(
     @param.filter(Accommodation) filter?: Filter<Accommodation>,
-  ): Promise<Accommodation[]> {
-    return this.accommodationRepository.find(filter);
+  ): Promise<IPaginationList<AccommodationRatingRelations>> {
+    return this.accommodationService.paginate(filter);
   }
 
   @patch('/accommodations')
