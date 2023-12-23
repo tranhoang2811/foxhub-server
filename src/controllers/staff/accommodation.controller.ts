@@ -8,6 +8,7 @@ import {
   Where,
 } from '@loopback/repository';
 import {
+  api,
   del,
   get,
   getModelSchemaRef,
@@ -18,11 +19,13 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
+import {EUserRole} from '../../enums/user';
 import {IPaginationList} from '../../interfaces/common';
 import {Accommodation, AccommodationRatingRelations} from '../../models';
 import {AccommodationRepository} from '../../repositories';
 import {AccommodationService} from '../../services/staff/accommodation.service';
 
+@api({basePath: `/${EUserRole.STAFF}`})
 export class AccommodationController {
   constructor(
     @repository(AccommodationRepository)
@@ -109,11 +112,10 @@ export class AccommodationController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Accommodation, {exclude: 'where'})
-    filter?: FilterExcludingWhere<Accommodation>,
-  ): Promise<Accommodation> {
-    return this.accommodationRepository.findById(id, filter);
+  ): Promise<AccommodationRatingRelations | null> {
+    return this.accommodationService.getById(id);
   }
+
 
   @patch('/accommodations/{id}')
   @response(204, {

@@ -2,11 +2,7 @@ import {AggregationPipeline} from '../../interfaces/mongo';
 
 export function getValidAccommodationPipeline(): AggregationPipeline {
   const validAccommodationPipeline: AggregationPipeline = [
-    {
-      $match: {
-        status: 'approved',
-      },
-    },
+
     {
       $lookup: {
         from: 'Users',
@@ -27,20 +23,13 @@ export function getValidAccommodationPipeline(): AggregationPipeline {
         path: '$owner',
       },
     },
-    {
-      $addFields: {
-        id: {
-          $toString: '$_id',
-        },
-      },
-    },
   ];
 
   return validAccommodationPipeline;
 }
 
-export function getAccommodationMediaPipeline(): AggregationPipeline {
-  const accommodationMediaPipeline: AggregationPipeline = [
+export function getAccommodationMediaAndRatingPipeline(): AggregationPipeline {
+  const accommodationMediaAndRatingPipeline: AggregationPipeline = [
     {
       $lookup: {
         from: 'Medias',
@@ -49,9 +38,59 @@ export function getAccommodationMediaPipeline(): AggregationPipeline {
         as: 'media',
       },
     },
+    {
+      $lookup: {
+        from: 'AccommodationRatings',
+        localField: '_id',
+        foreignField: 'accommodationId',
+        as: 'reviews',
+      },
+    },
   ];
 
-  return accommodationMediaPipeline;
+  return accommodationMediaAndRatingPipeline;
 }
 
+export function getGenerateAccommodationInformationPipeline(): AggregationPipeline {
+  const generateAccommodationInformationPipeline: AggregationPipeline = [
+    {
+      $addFields: {
+        averageRating: {
+          $cond: {
+            if: {$eq: [{$size: '$reviews'}, 0]},
+            then: 0,
+            else: {
+              $divide: [{$sum: '$reviews.rate'}, {$size: '$reviews'}],
+            },
+          },
+        },
+        totalRating: {
+          $size: '$reviews',
+        },
+        ownerName: {
+          $concat: [
+            {$ifNull: ['$owner.firstName', '']},
+            ' ',
+            {$ifNull: ['$owner.lastName', '']},
+          ],
+        },
+        imageUrl: {
+          $arrayElemAt: ['$media.source', 0],
+        },
+        id: {
+          $toString: '$_id',
+        },
+      },
+    },
+    {
+      $addFields: {
+        owner: '$$REMOVE',
+        media: '$$REMOVE',
+        reviews: '$$REMOVE',
+        _id: '$$REMOVE',
+      },
+    },
+  ];
 
+  return generateAccommodationInformationPipeline;
+}
