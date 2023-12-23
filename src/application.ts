@@ -1,10 +1,13 @@
-import {AuthenticationComponent} from '@loopback/authentication';
+import {
+  AuthenticationComponent,
+  registerAuthenticationStrategy,
+} from '@loopback/authentication';
 import {BootMixin} from '@loopback/boot';
 import {
   ApplicationConfig,
   Constructor,
-  createBindingFromClass,
   Provider,
+  createBindingFromClass,
 } from '@loopback/core';
 import {RepositoryMixin} from '@loopback/repository';
 import {
@@ -19,6 +22,7 @@ import {
 import {ServiceMixin} from '@loopback/service-proxy';
 import passport from 'passport';
 import path from 'path';
+import {JWTAuthenticationStrategy} from './authentication-strategies/jwt.strategy';
 import {FACEBOOK_OAUTH_OPTIONS, GOOGLE_OAUTH_OPTIONS} from './config/oauth';
 import {FacebookOAuthInterceptor, GoogleOAuthInterceptor} from './interceptors';
 import {
@@ -53,6 +57,7 @@ export class FoxhubServerApplication extends BootMixin(
 
     // Bind authentication component
     this.component(AuthenticationComponent);
+    registerAuthenticationStrategy(this, JWTAuthenticationStrategy);
 
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({

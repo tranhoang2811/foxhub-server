@@ -1,7 +1,7 @@
 import {BindingScope, inject, injectable} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors} from '@loopback/rest';
-import {securityId, UserProfile} from '@loopback/security';
+import {UserProfile, securityId} from '@loopback/security';
 import omit from 'lodash/omit';
 import {INVALID_CREDENTIALS_ERROR} from '../constants/auth';
 import {LoginCredentialsDto} from '../dtos/auth/requests/login.request';
@@ -47,6 +47,11 @@ export class AuthService {
       password: hashedPassword,
       userId: createdUser.id,
     });
+  }
+
+  public async getUserProfile(userId: string): Promise<User> {
+    const user: User = await this.userRepository.findById(userId);
+    return user;
   }
 
   public convertToUserProfile(user: User): UserProfile {
