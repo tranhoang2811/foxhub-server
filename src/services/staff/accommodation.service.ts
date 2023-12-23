@@ -1,8 +1,12 @@
 import {BindingScope, injectable} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
-import {getPaginationPipeline} from '../../aggregations/common';
 import {
-  getAccommodationMediaPipeline,
+  getPaginationPipeline,
+  getDetailPipeline,
+} from '../../aggregations/common';
+import {
+  getAccommodationMediaAndRatingPipeline,
+  getGenerateAccommodationInformationPipeline,
   getValidAccommodationPipeline,
 } from '../../aggregations/staff/accommodation';
 import {IPaginationList} from '../../interfaces/common';
@@ -16,22 +20,24 @@ export class AccommodationService {
     @repository(AccommodationRepository)
     private accommodationRepository: AccommodationRepository,
   ) {}
-
+  private getBasePipeline(): AggregationPipeline {
+    return [
+      ...getValidAccommodationPipeline(),
+      ...getAccommodationMediaAndRatingPipeline(),
+      ...getGenerateAccommodationInformationPipeline(),
+    ];
+  }
   public async paginate(
     filter?: Filter<Accommodation>,
   ): Promise<IPaginationList<AccommodationRatingRelations>> {
-    const skip: number = filter?.skip ?? 0;
-    const limit: number = filter?.limit ?? 9;
-
     const accommodationCollection =
       this.accommodationRepository.dataSource?.connector?.collection(
         this.accommodationRepository?.modelClass?.name,
       );
 
     const pipeline: AggregationPipeline = [
-      ...getValidAccommodationPipeline(),
-      ...getAccommodationMediaPipeline(),
-      ...getPaginationPipeline(skip, limit),
+      ...this.getBasePipeline(),
+      ...getPaginationPipeline(),
     ];
 
     const result = (
@@ -42,5 +48,25 @@ export class AccommodationService {
       list: result?.data ?? [],
       totalCount: result?.counter?.[0]?.total ?? 0,
     };
+  }
+
+  public async getById(
+    id: string,
+  ): Promise<AccommodationRatingRelations | null> {
+    const accommodationCollection =
+      this.accommodationRepository.dataSource?.connector?.collection(
+        this.accommodationRepository?.modelClass?.name,
+      );
+
+    const pipeline: AggregationPipeline = [
+      ...getValidAccommodationPipeline(),
+      ...getAccommodationMediaAndRatingPipeline(),
+      ...getGenerateAccommodationInformationPipeline(),
+      ...getDetailPipeline(id),
+    ];
+
+    const result = await accommodationCollection.aggregate(pipeline)?.toArray();
+
+    return result?.[0] || null;
   }
 }
