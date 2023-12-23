@@ -1,5 +1,6 @@
 import {hasMany, hasOne, model, property} from '@loopback/repository';
 import {EUserRole, EUserStatus} from '../enums/user';
+import {AccommodationRating} from './accommodation-rating.model';
 import {AccommodationReport} from './accommodation-report.model';
 import {Accommodation} from './accommodation.model';
 import {Base} from './base.model';
@@ -7,7 +8,6 @@ import {FavoriteAccommodation} from './favorite-accommodation.model';
 import {Reservation} from './reservation.model';
 import {UserCredential} from './user-credential.model';
 import {UserIdentity} from './user-identity.model';
-import {AccommodationRating} from './accommodation-rating.model';
 
 @model({
   settings: {
@@ -50,15 +50,13 @@ export class User extends Base {
 
   @property({
     type: 'date',
-    required: true,
   })
-  dateOfBirth: Date;
+  dateOfBirth?: Date;
 
   @property({
     type: 'string',
-    required: true,
   })
-  occupation: string;
+  occupation?: string;
 
   @property({
     type: 'string',
@@ -78,6 +76,11 @@ export class User extends Base {
     },
   })
   role: EUserRole;
+
+  @property({
+    type: 'string',
+  })
+  avatar?: string;
 
   @hasOne(() => UserCredential)
   userCredential: UserCredential;

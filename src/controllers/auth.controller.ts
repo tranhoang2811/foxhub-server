@@ -1,16 +1,16 @@
-import {AuthenticationBindings} from '@loopback/authentication';
+import {AuthenticationBindings, authenticate} from '@loopback/authentication';
 import {inject, service} from '@loopback/core';
 import {
+  RequestWithSession,
+  Response,
+  RestBindings,
   get,
   getModelSchemaRef,
   post,
   requestBody,
-  RequestWithSession,
-  Response,
   response,
-  RestBindings,
 } from '@loopback/rest';
-import {SecurityBindings, UserProfile} from '@loopback/security';
+import {SecurityBindings, UserProfile, securityId} from '@loopback/security';
 import omit from 'lodash/omit';
 import {BE_BASE_URL} from '../config';
 import {LoginCredentialsDto} from '../dtos/auth/requests/login.request';
@@ -94,5 +94,15 @@ export class AuthController {
     return response.redirect(
       `${BE_BASE_URL}/social-authentication-loading?token=${token}`,
     );
+  }
+
+  @authenticate('jwt')
+  @get('/auth/profile')
+  async getProfile(
+    @inject(SecurityBindings.USER)
+    currentUserProfile: UserProfile,
+  ): Promise<User> {
+    const userId: string = currentUserProfile[securityId];
+    return this.authService.getUserProfile(userId);
   }
 }

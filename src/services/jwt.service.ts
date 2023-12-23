@@ -1,7 +1,7 @@
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors, Request} from '@loopback/rest';
-import {securityId, UserProfile} from '@loopback/security';
+import {UserProfile, securityId} from '@loopback/security';
 import jwt, {JwtPayload} from 'jsonwebtoken';
 import {EUserStatus} from '../enums/user';
 import {IDecodedToken} from '../interfaces/auth';
@@ -42,7 +42,7 @@ export class JWTService {
       const user: UserWithRelations = await this.userRepository.findById(
         userProfile.id,
         {
-          include: [{relation: 'userCredentials'}],
+          include: [{relation: 'userCredential'}],
         },
       );
 
