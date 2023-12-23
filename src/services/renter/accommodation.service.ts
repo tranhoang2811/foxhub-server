@@ -8,7 +8,11 @@ import {
 } from '../../aggregations/renter/accommodation';
 import {IPaginationList} from '../../interfaces/common';
 import {AggregationPipeline} from '../../interfaces/mongo';
-import {Accommodation, AccommodationRatingRelations} from '../../models';
+import {
+  Accommodation,
+  AccommodationRatingRelations,
+  AccommodationWithRelations,
+} from '../../models';
 import {AccommodationRepository} from '../../repositories';
 
 @injectable({scope: BindingScope.TRANSIENT})
@@ -44,5 +48,34 @@ export class AccommodationService {
       list: result?.data ?? [],
       totalCount: result?.counter?.[0]?.total ?? 0,
     };
+  }
+
+  public async getDetail(id: string): Promise<AccommodationWithRelations> {
+    const accommodation: AccommodationWithRelations =
+      await this.accommodationRepository.findById(id, {
+        include: [
+          {
+            relation: 'owner',
+          },
+          {
+            relation: 'rooms',
+          },
+          {
+            relation: 'media',
+          },
+          {
+            relation: 'accommodationRatings',
+            scope: {
+              include: [
+                {
+                  relation: 'reviewer',
+                },
+              ],
+            },
+          },
+        ],
+      });
+
+    return accommodation;
   }
 }

@@ -1,5 +1,6 @@
 import {AggregationPipeline} from '../../interfaces/mongo';
 
+// *INFO: Pagination pipeline
 export function getValidAccommodationPipeline(): AggregationPipeline {
   const validAccommodationPipeline: AggregationPipeline = [
     {
