@@ -3,7 +3,11 @@ import {Filter, repository} from '@loopback/repository';
 import {api, get, getModelSchemaRef, param, response} from '@loopback/rest';
 import {EUserRole} from '../../enums/user';
 import {IPaginationList} from '../../interfaces/common';
-import {Accommodation, AccommodationRatingRelations} from '../../models';
+import {
+  Accommodation,
+  AccommodationRatingRelations,
+  AccommodationWithRelations,
+} from '../../models';
 import {AccommodationRepository} from '../../repositories';
 import {AccommodationService} from '../../services/staff/accommodation.service';
 
@@ -34,16 +38,16 @@ export class AccommodationController {
 
   @get('/accommodations/{id}')
   @response(200, {
-    description: 'Accommodation model instance',
+    description: 'Accommodation detail',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(Accommodation, {includeRelations: true}),
+        schema: {},
       },
     },
   })
-  async findById(
+  async getDetail(
     @param.path.string('id') id: string,
-  ): Promise<AccommodationRatingRelations | null> {
-    return this.accommodationService.getById(id);
+  ): Promise<AccommodationWithRelations> {
+    return this.accommodationService.getDetail(id);
   }
 }

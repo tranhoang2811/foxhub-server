@@ -2,7 +2,6 @@ import {AggregationPipeline} from '../../interfaces/mongo';
 
 export function getValidAccommodationPipeline(): AggregationPipeline {
   const validAccommodationPipeline: AggregationPipeline = [
-
     {
       $lookup: {
         from: 'Users',
@@ -93,4 +92,21 @@ export function getGenerateAccommodationInformationPipeline(): AggregationPipeli
   ];
 
   return generateAccommodationInformationPipeline;
+}
+
+export function getPaginationPipeline(): AggregationPipeline {
+  const paginationPipeline: AggregationPipeline = [
+    {
+      $facet: {
+        counter: [
+          {
+            $count: 'total',
+          },
+        ],
+        data: [],
+      },
+    },
+  ];
+
+  return paginationPipeline;
 }
