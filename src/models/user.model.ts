@@ -1,10 +1,13 @@
-import {model, property, hasOne, hasMany} from '@loopback/repository';
+import {hasMany, hasOne, model, property} from '@loopback/repository';
 import {EUserRole, EUserStatus} from '../enums/user';
+import {AccommodationRating} from './accommodation-rating.model';
+import {AccommodationReport} from './accommodation-report.model';
+import {Accommodation} from './accommodation.model';
 import {Base} from './base.model';
-import {UserCredential} from './user-credential.model';
+import {FavoriteAccommodation} from './favorite-accommodation.model';
 import {Reservation} from './reservation.model';
-import {FavoriteHouse} from './favorite-house.model';
-import {HouseReport} from './house-report.model';
+import {UserCredential} from './user-credential.model';
+import {UserIdentity} from './user-identity.model';
 
 @model({
   settings: {
@@ -48,7 +51,12 @@ export class User extends Base {
   @property({
     type: 'date',
   })
-  dateOfBirth?: string;
+  dateOfBirth?: Date;
+
+  @property({
+    type: 'string',
+  })
+  occupation?: string;
 
   @property({
     type: 'string',
@@ -69,17 +77,31 @@ export class User extends Base {
   })
   role: EUserRole;
 
+  @property({
+    type: 'string',
+  })
+  avatar?: string;
+
   @hasOne(() => UserCredential)
   userCredential: UserCredential;
 
   @hasMany(() => Reservation, {keyTo: 'renterId'})
   reservations: Reservation[];
 
-  @hasMany(() => FavoriteHouse, {keyTo: 'renterId'})
-  favoriteHouses: FavoriteHouse[];
+  @hasMany(() => FavoriteAccommodation, {keyTo: 'renterId'})
+  favoriteAccommodations: FavoriteAccommodation[];
 
-  @hasMany(() => HouseReport, {keyTo: 'reporterId'})
-  houseReports: HouseReport[];
+  @hasMany(() => AccommodationReport, {keyTo: 'reporterId'})
+  accommodationReports: AccommodationReport[];
+
+  @hasMany(() => UserIdentity)
+  userIdentities: UserIdentity[];
+
+  @hasMany(() => Accommodation, {keyTo: 'ownerId'})
+  accommodations: Accommodation[];
+
+  @hasMany(() => AccommodationRating, {keyTo: 'reviewerId'})
+  accommodationRatings: AccommodationRating[];
 
   constructor(data?: Partial<User>) {
     super(data);

@@ -1,23 +1,33 @@
-import {inject, Getter} from '@loopback/core';
+import {Getter, inject} from '@loopback/core';
+import {BelongsToAccessor, repository} from '@loopback/repository';
 import {MongodbDataSource} from '../datasources';
-import {Room, RoomRelations, House} from '../models';
+import {Accommodation, Room, RoomRelations} from '../models';
+import {AccommodationRepository} from './accommodation.repository';
 import {CrudRepository} from './crud.repository.base';
-import {repository, BelongsToAccessor} from '@loopback/repository';
-import {HouseRepository} from './house.repository';
 
 export class RoomRepository extends CrudRepository<
   Room,
   typeof Room.prototype.id,
   RoomRelations
 > {
-
-  public readonly house: BelongsToAccessor<House, typeof Room.prototype.id>;
+  public readonly accommodation: BelongsToAccessor<
+    Accommodation,
+    typeof Room.prototype.id
+  >;
 
   constructor(
-    @inject('datasources.mongodb') dataSource: MongodbDataSource, @repository.getter('HouseRepository') protected houseRepositoryGetter: Getter<HouseRepository>,
+    @inject('datasources.mongodb') dataSource: MongodbDataSource,
+    @repository.getter('AccommodationRepository')
+    protected accommodationRepositoryGetter: Getter<AccommodationRepository>,
   ) {
     super(Room, dataSource);
-    this.house = this.createBelongsToAccessorFor('house', houseRepositoryGetter,);
-    this.registerInclusionResolver('house', this.house.inclusionResolver);
+    this.accommodation = this.createBelongsToAccessorFor(
+      'accommodation',
+      accommodationRepositoryGetter,
+    );
+    this.registerInclusionResolver(
+      'accommodation',
+      this.accommodation.inclusionResolver,
+    );
   }
 }

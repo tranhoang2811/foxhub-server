@@ -1,8 +1,9 @@
-import {model, property, belongsTo} from '@loopback/repository';
-import {EReservationPaymentStatus} from '../enums/reservation';
+import {belongsTo, model, property, hasOne} from '@loopback/repository';
+import {EPaymentMethod, EReservationPaymentStatus} from '../enums/reservation';
 import {Base} from './base.model';
 import {Room} from './room.model';
 import {User} from './user.model';
+import {ReservationCancellation} from './reservation-cancellation.model';
 
 @model({
   settings: {
@@ -20,15 +21,31 @@ export class Reservation extends Base {
   id: string;
 
   @property({
-    type: 'string',
+    type: 'number',
+    required: true,
   })
-  cancellationReason?: string;
+  numberOfAdult: number;
+
+  @property({
+    type: 'number',
+    required: true,
+  })
+  numberOfChildren: number;
+
+  @property({
+    type: 'number',
+    required: true,
+  })
+  paymentCode: number;
 
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      enum: Object.values(EPaymentMethod),
+    },
   })
-  paymentCode: string;
+  paymentMethod: EPaymentMethod;
 
   @property({
     type: 'string',
@@ -43,19 +60,22 @@ export class Reservation extends Base {
     type: 'date',
     required: true,
   })
-  checkIn: string;
+  checkIn: Date;
 
   @property({
     type: 'date',
     required: true,
   })
-  checkOut: string;
+  checkOut: Date;
 
   @belongsTo(() => Room)
   roomId: string;
 
   @belongsTo(() => User)
   renterId: string;
+
+  @hasOne(() => ReservationCancellation)
+  reservationCancellation: ReservationCancellation;
 
   constructor(data?: Partial<Reservation>) {
     super(data);
