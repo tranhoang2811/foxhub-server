@@ -2,16 +2,17 @@ import {BindingScope, injectable} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
 import {
   getPaginationPipeline,
-  getDetailPipeline,
-} from '../../aggregations/common';
-import {
   getAccommodationMediaAndRatingPipeline,
   getGenerateAccommodationInformationPipeline,
   getValidAccommodationPipeline,
 } from '../../aggregations/staff/accommodation';
 import {IPaginationList} from '../../interfaces/common';
 import {AggregationPipeline} from '../../interfaces/mongo';
-import {Accommodation, AccommodationRatingRelations} from '../../models';
+import {
+  Accommodation,
+  AccommodationRatingRelations,
+  AccommodationWithRelations,
+} from '../../models';
 import {AccommodationRepository} from '../../repositories';
 
 @injectable({scope: BindingScope.TRANSIENT})
@@ -20,13 +21,7 @@ export class AccommodationService {
     @repository(AccommodationRepository)
     private accommodationRepository: AccommodationRepository,
   ) {}
-  private getBasePipeline(): AggregationPipeline {
-    return [
-      ...getValidAccommodationPipeline(),
-      ...getAccommodationMediaAndRatingPipeline(),
-      ...getGenerateAccommodationInformationPipeline(),
-    ];
-  }
+
   public async paginate(
     filter?: Filter<Accommodation>,
   ): Promise<IPaginationList<AccommodationRatingRelations>> {
@@ -36,7 +31,9 @@ export class AccommodationService {
       );
 
     const pipeline: AggregationPipeline = [
-      ...this.getBasePipeline(),
+      ...getValidAccommodationPipeline(),
+      ...getAccommodationMediaAndRatingPipeline(),
+      ...getGenerateAccommodationInformationPipeline(),
       ...getPaginationPipeline(),
     ];
 
@@ -50,23 +47,61 @@ export class AccommodationService {
     };
   }
 
-  public async getById(
-    id: string,
-  ): Promise<AccommodationRatingRelations | null> {
+  public async getDetail(id: string): Promise<AccommodationWithRelations> {
     const accommodationCollection =
       this.accommodationRepository.dataSource?.connector?.collection(
         this.accommodationRepository?.modelClass?.name,
       );
 
-    const pipeline: AggregationPipeline = [
-      ...getValidAccommodationPipeline(),
-      ...getAccommodationMediaAndRatingPipeline(),
-      ...getGenerateAccommodationInformationPipeline(),
-      ...getDetailPipeline(id),
+    const addFieldsStage = {
+      $addFields: {
+        id: {
+          $toString: '$_id',
+        },
+      },
+    };
+
+    const matchStage = {
+      $match: {
+        id: id,
+      },
+    };
+
+    const mediaLookupStage = {
+      $lookup: {
+        from: 'Medias',
+        localField: '_id',
+        foreignField: 'accommodationId',
+        as: 'media',
+      },
+    };
+
+    const ownerLookupStage = {
+      $lookup: {
+        from: 'Users',
+        localField: 'ownerId',
+        foreignField: '_id',
+        as: 'owner',
+      },
+    };
+
+    const unwindOwnerStage = {
+      $unwind: {
+        path: '$owner',
+      },
+    };
+
+    const pipeline = [
+      addFieldsStage,
+      matchStage,
+      mediaLookupStage,
+      ownerLookupStage,
+      unwindOwnerStage,
     ];
 
     const result = await accommodationCollection.aggregate(pipeline)?.toArray();
+    const accommodation: AccommodationWithRelations = result?.[0];
 
-    return result?.[0] || null;
+    return accommodation;
   }
 }
