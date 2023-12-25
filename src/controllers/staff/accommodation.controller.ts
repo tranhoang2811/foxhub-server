@@ -10,7 +10,7 @@ import {
 } from '../../models';
 import {AccommodationRepository} from '../../repositories';
 import {AccommodationService} from '../../services/staff/accommodation.service';
-
+import {User} from '../../models';
 @api({basePath: `/${EUserRole.STAFF}`})
 export class AccommodationController {
   constructor(
@@ -49,5 +49,32 @@ export class AccommodationController {
     @param.path.string('id') id: string,
   ): Promise<AccommodationWithRelations> {
     return this.accommodationService.getDetail(id);
+  }
+  @get('/users')
+  @response(200, {
+    description: 'Get all users',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(User),
+        },
+      },
+    },
+  })
+  async getAllUsers(): Promise<User[]> {
+    return this.accommodationService.getAllUsers();
+  }
+  @get('/users/{id}')
+  @response(200, {
+    description: 'Get a user by ID',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(User),
+      },
+    },
+  })
+  async getUserById(@param.path.string('id') id: string): Promise<User | null> {
+    return this.accommodationService.getUserById(id);
   }
 }
