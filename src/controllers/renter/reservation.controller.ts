@@ -34,6 +34,8 @@ export class ReservationController {
     content: {'application/json': {schema: getModelSchemaRef(Reservation)}},
   })
   async create(
+    @inject(SecurityBindings.USER)
+    currentUserProfile: UserProfile,
     @requestBody({
       content: {
         'application/json': {
@@ -46,7 +48,8 @@ export class ReservationController {
     })
     reservation: Omit<Reservation, 'id'>,
   ): Promise<Reservation> {
-    return this.reservationRepository.create(reservation);
+    const userId: string = currentUserProfile[securityId];
+    return this.reservationService.create(userId, reservation);
   }
 
   @get('/reservations/{status}')

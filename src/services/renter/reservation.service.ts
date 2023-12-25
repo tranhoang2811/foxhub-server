@@ -2,6 +2,7 @@ import {BindingScope, injectable} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
 import {getPaginationPipeline} from '../../aggregations/common';
 import {getValidReservationPipeline} from '../../aggregations/renter/reservation';
+import {EReservationPaymentStatus} from '../../enums/reservation';
 import {IPaginationList} from '../../interfaces/common';
 import {AggregationPipeline} from '../../interfaces/mongo';
 import {Reservation} from '../../models';
@@ -40,5 +41,16 @@ export class ReservationService {
       list: result?.data ?? [],
       totalCount: result?.counter?.[0]?.total ?? 0,
     };
+  }
+
+  public async create(
+    renterId: string,
+    reservation: Omit<Reservation, 'id'>,
+  ): Promise<Reservation> {
+    return this.reservationRepository.create({
+      ...reservation,
+      renterId,
+      status: EReservationPaymentStatus.PENDING,
+    });
   }
 }
