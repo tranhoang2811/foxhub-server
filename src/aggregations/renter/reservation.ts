@@ -16,6 +16,11 @@ export function getValidReservationPipeline(status: string, renterId: string) {
         renterStringId: renterId,
       },
     },
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
   ];
 
   if (status === 'all') {
@@ -27,6 +32,7 @@ export function getValidReservationPipeline(status: string, renterId: string) {
           },
           {status: 'completed'},
           {status: 'cancel'},
+          {status: 'pending'},
         ],
       },
     });
