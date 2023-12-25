@@ -9,16 +9,16 @@ import {
   AccommodationWithRelations,
 } from '../../models';
 import {AccommodationRepository} from '../../repositories';
-import {AccommodationService} from '../../services/staff/accommodation.service';
+import {StaffAccommodationService} from '../../services/staff/accommodation.service';
 import {User} from '../../models';
 @api({basePath: `/${EUserRole.STAFF}`})
-export class AccommodationController {
+export class StaffAccommodationController {
   constructor(
     @repository(AccommodationRepository)
     public accommodationRepository: AccommodationRepository,
 
-    @service(AccommodationService)
-    public accommodationService: AccommodationService,
+    @service(StaffAccommodationService)
+    public accommodationService: StaffAccommodationService,
   ) {}
 
   @get('/accommodations')

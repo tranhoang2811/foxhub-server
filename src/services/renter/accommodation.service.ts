@@ -16,7 +16,7 @@ import {
 import {AccommodationRepository} from '../../repositories';
 
 @injectable({scope: BindingScope.TRANSIENT})
-export class AccommodationService {
+export class RenterAccommodationService {
   constructor(
     @repository(AccommodationRepository)
     private accommodationRepository: AccommodationRepository,

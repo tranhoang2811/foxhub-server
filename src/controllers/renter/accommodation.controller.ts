@@ -9,14 +9,14 @@ import {
   AccommodationRatingRelations,
   AccommodationWithRelations,
 } from '../../models';
-import {AccommodationService} from '../../services/renter/accommodation.service';
+import {RenterAccommodationService} from '../../services/renter/accommodation.service';
 
 @authenticate('jwt')
 @api({basePath: `/${EUserRole.RENTER}`})
-export class AccommodationController {
+export class RenterAccommodationController {
   constructor(
-    @service(AccommodationService)
-    public accommodationService: AccommodationService,
+    @service(RenterAccommodationService)
+    public accommodationService: RenterAccommodationService,
   ) {}
 
   @get('/accommodations')
