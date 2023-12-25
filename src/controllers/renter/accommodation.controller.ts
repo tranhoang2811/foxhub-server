@@ -1,5 +1,6 @@
+import {authenticate} from '@loopback/authentication';
 import {service} from '@loopback/core';
-import {Filter, repository} from '@loopback/repository';
+import {Filter} from '@loopback/repository';
 import {api, get, param, response} from '@loopback/rest';
 import {EUserRole} from '../../enums/user';
 import {IPaginationList} from '../../interfaces/common';
@@ -8,15 +9,12 @@ import {
   AccommodationRatingRelations,
   AccommodationWithRelations,
 } from '../../models';
-import {AccommodationRepository} from '../../repositories';
 import {AccommodationService} from '../../services/renter/accommodation.service';
 
+@authenticate('jwt')
 @api({basePath: `/${EUserRole.RENTER}`})
 export class AccommodationController {
   constructor(
-    @repository(AccommodationRepository)
-    public accommodationRepository: AccommodationRepository,
-
     @service(AccommodationService)
     public accommodationService: AccommodationService,
   ) {}
