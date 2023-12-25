@@ -14,12 +14,15 @@ import {
   AccommodationWithRelations,
 } from '../../models';
 import {AccommodationRepository} from '../../repositories';
-
+import {User} from '../../models';
+import {UserRepository} from '../../repositories';
 @injectable({scope: BindingScope.TRANSIENT})
 export class AccommodationService {
   constructor(
     @repository(AccommodationRepository)
     private accommodationRepository: AccommodationRepository,
+    @repository(UserRepository)
+    private userRepository: UserRepository,
   ) {}
 
   public async paginate(
@@ -103,5 +106,11 @@ export class AccommodationService {
     const accommodation: AccommodationWithRelations = result?.[0];
 
     return accommodation;
+  }
+  public async getAllUsers(): Promise<User[]> {
+    return this.userRepository.find();
+  }
+  public async getUserById(userId: string): Promise<User | null> {
+    return this.userRepository.findById(userId);
   }
 }
