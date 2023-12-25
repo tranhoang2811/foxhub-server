@@ -51,6 +51,7 @@ export class ReservationService {
       ...reservation,
       renterId,
       status: EReservationPaymentStatus.PENDING,
+      paymentCode: Math.floor(Math.random() * 1000000),
     });
   }
 }

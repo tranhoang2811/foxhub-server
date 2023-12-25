@@ -10,7 +10,7 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {SecurityBindings, UserProfile, securityId} from '@loopback/security';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 import {EUserRole} from '../../enums/user';
 import {IPaginationList} from '../../interfaces/common';
 import {Reservation} from '../../models';
@@ -41,7 +41,7 @@ export class ReservationController {
         'application/json': {
           schema: getModelSchemaRef(Reservation, {
             title: 'NewReservation',
-            exclude: ['id'],
+            exclude: ['id', 'paymentCode', 'status'],
           }),
         },
       },
